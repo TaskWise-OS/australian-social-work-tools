@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Australian Social Work Tools Library</title>
+  <style>
+    :root {
+      --bg: #f4f6fa;
+      --card: #fff;
+      --primary: #003366;
+      --primary-lo: #00509e;
+      --accent: #ffa500;
+      --text: #1e1e1e;
+      --muted: #5a6272;
+      --border: #dde3ee;
+      --r: 10px;
+      --ai: linear-gradient(135deg, #00843d, #003366);
+      --s-bg: #d4edda;
+      --s-fg: #155724;
+      --w-bg: #fff3cd;
+      --w-fg: #856404;
+      --d-bg: #f8d7da;
+      --d-fg: #721c24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #003366, #00509e);
+      color: #fff;
+      padding: 26px 16px 22px;
+      text-align: center
+    }
+
+    header h1 {
+      font-size: 1.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 5px
+    }
+
+    header p {
+      opacity: .82;
+      font-size: .92rem
+    }
+
+    /* ── TOAST ── */
+    .toast-wrap {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      pointer-events: none
+    }
+
+    .toast {
+      background: var(--primary);
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-size: .83rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .22);
+      transform: translateX(115%);
+      transition: transform .28s ease;
+      pointer-events: auto;
+      max-width: 290px
+    }
+
+    .toast.show {
+      transform: translateX(0)
+    }
+
+    .toast.ok {
+      background: #1a7a32
+    }
+
+    .toast.warn {
+      background: #dda312;
+      color: #222
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      max-width: 1100px;
+      margin: 22px auto 44px;
+      padding: 0 16px
+    }
+
+    /* ── AI PANEL ── */
+    .ai-panel {
+      background: #fff;
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 22px;
+      border: 2px solid transparent;
+      background-image: linear-gradient(#fff, #fff), var(--ai);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: 0 4px 18px rgba(0, 132, 61, .14)
+    }
+
+    .ai-top {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 13px
+    }
+
+    .ai-icon {
+      width: 33px;
+      height: 33px;
+      background: var(--ai);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: .88rem;
+      flex-shrink: 0
+    }
+
+    .ai-top-title {
+      font-weight: 600;
+      font-size: 1.02rem
+    }
+
+    .ai-input-row {
+      display: flex;
+      gap: 7px
+    }
+
+    .ai-input {
+      flex: 1;
+      padding: 11px 17px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: .92rem;
+      outline: none
+    }
+
+    .ai-input:focus {
+      border-color: #00843d;
+      box-shadow: 0 0 0 3px rgba(0, 132, 61, .14)
+    }
+
+    .ai-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 11px 22px;
+      font-size: .86rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--ai);
+      color: #fff;
+      transition: opacity .2s, transform .14s
+    }
+
+    .ai-btn:hover {
+      opacity: .86;
+      transform: scale(1.02)
+    }
+
+    .ai-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    /* ── RECOMMENDATION FILTERS ── */
+    .rec-filter:hover {
+      border-color: #0066cc !important;
+      background: #f8f9ff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+    }
+
+
+    .qps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 13px
+    }
+
+    .qp {
+      padding: 5px 13px;
+      border-radius: 999px;
+      border: 1px solid #c0ddd0;
+      background: #fff;
+      color: #00843d;
+      font-size: .76rem;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .qp:hover {
+      background: #00843d;
+      color: #fff
+    }
+
+    .ai-resp {
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 13px;
+      display: none;
+      border-left: 4px solid #00843d;
+      background: #eef8f2
+    }
+
+    .ai-resp.on {
+      display: block
+    }
+
+    .ai-resp.fb {
+      background: #fffbe4;
+      border-left-color: var(--accent)
+    }
+
+    .ai-resp p {
+      font-size: .86rem;
+      line-height: 1.64;
+      margin-bottom: 7px
+    }
+
+    .ai-resp p:last-child {
+      margin-bottom: 0
+    }
+
+    .ai-resp .clear-ai {
+      font-size: .75rem;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 6px;
+      display: inline-block
+    }
+
+    .ai-resp .clear-ai:hover {
+      color: var(--primary)
+    }
+
+    .ai-loading {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #00843d;
+      font-size: .86rem
+    }
+
+    .spinner {
+      width: 17px;
+      height: 17px;
+      border: 2px solid #c0ddd0;
+      border-top-color: #00843d;
+      border-radius: 50%;
+      animation: sp .7s linear infinite
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 3px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+      flex-wrap: wrap
+    }
+
+    .tb {
+      padding: 9px 18px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all .2s;
+      white-space: nowrap
+    }
+
+    .tb:hover {
+      color: var(--primary)
+    }
+
+    .tb.on {
+      color: var(--primary);
+      border-bottom-color: var(--primary)
+    }
+
+    .pane {
+      display: none
+    }
+
+    .pane.on {
+      display: block
+    }
+
+    /* ── CONTROLS ── */
+    .ctrl {
+      display: flex;
+      gap: 9px;
+      margin-bottom: 13px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .ctrl label {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    .ctrl select {
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: .86rem;
+      outline: none;
+      background: #fff
+    }
+
+    .ctrl select:focus {
+      border-color: var(--primary)
+    }
+
+    .sg {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 9px;
+      margin-bottom: 13px
+    }
+
+    .sg input,
+    .sg select {
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: .88rem;
+      outline: none
+    }
+
+    .sg input:focus,
+    .sg select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 51, 102, .11)
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 13px
+    }
+
+    .pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: .75rem;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .pill:hover {
+      border-color: var(--primary);
+      color: var(--primary)
+    }
+
+    .pill.on {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary)
+    }
+
+    .meta {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 13px
+    }
+
+    /* ── CARDS ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 15px
+    }
+
+    .card {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+      transition: transform .2s, box-shadow .2s
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 16px rgba(0, 0, 0, .08)
+    }
+
+    .card.ai-rec {
+      border-color: #00843d;
+      box-shadow: 0 3px 14px rgba(0, 132, 61, .17)
+    }
+
+    .card.fav {
+      border-left: 4px solid var(--accent)
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 7px;
+      align-items: flex-start
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: .93rem;
+      flex: 1;
+      line-height: 1.33
+    }
+
+    .card-btns {
+      display: flex;
+      gap: 3px;
+      flex-shrink: 0
+    }
+
+    .ib {
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      transition: all .2s
+    }
+
+    .ib:hover {
+      border-color: var(--primary);
+      background: var(--bg)
+    }
+
+    .ib.on {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .bdg {
+      font-size: .66rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(0, 51, 102, .07);
+      color: var(--primary)
+    }
+
+    .bdg.st {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .bdg.ai {
+      background: var(--ai);
+      color: #fff
+    }
+
+    .card-desc {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.42
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px
+    }
+
+    .tag {
+      font-size: .66rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #edf0f7;
+      color: var(--muted)
+    }
+
+    .card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 7px;
+      margin-top: 3px
+    }
+
+    .card-foot .src {
+      font-size: .7rem;
+      color: var(--muted)
+    }
+
+    .btn-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: .76rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s
+    }
+
+    .btn-open:hover {
+      background: #002244
+    }
+
+    /* ── MODAL ── */
+    .mo {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .42);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 18px
+    }
+
+    .mo.on {
+      display: flex
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 11px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 86vh;
+      overflow-y: auto;
+      padding: 26px;
+      position: relative
+    }
+
+    .mc {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      width: 29px;
+      height: 29px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mc:hover {
+      background: var(--border)
+    }
+
+    .modal h2 {
+      color: var(--primary);
+      font-size: 1.15rem;
+      margin-bottom: 9px
+    }
+
+    .modal h3 {
+      font-size: .9rem;
+      margin: 15px 0 5px;
+      color: var(--text)
+    }
+
+    .modal p {
+      font-size: .85rem;
+      line-height: 1.58;
+      color: var(--text)
+    }
+
+    /* ── FORMS ── */
+    .fbox {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 19px;
+      margin-bottom: 20px
+    }
+
+    .fbox h3 {
+      font-size: .93rem;
+      margin-bottom: 13px;
+      color: var(--primary)
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 13px
+    }
+
+    .fg label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--text)
+    }
+
+    .fg input,
+    .fg select,
+    .fg textarea {
+      padding: 9px 11px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      font-size: .88rem;
+      font-family: inherit;
+      outline: none
+    }
+
+    .fg input:focus,
+    .fg select:focus,
+    .fg textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 51, 102, .11)
+    }
+
+    .fg textarea {
+      min-height: 74px;
+      resize: vertical
+    }
+
+    .fg select[multiple] {
+      height: 96px
+    }
+
+    /* ── DASHBOARD ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px
+    }
+
+    .dash-card {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 18px;
+      text-align: center
+    }
+
+    .dash-num {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary)
+    }
+
+    .dash-label {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 3px
+    }
+
+    .dash-section {
+      margin-bottom: 22px
+    }
+
+    .dash-section h3 {
+      font-size: .9rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .dash-list {
+      list-style: none
+    }
+
+    .dash-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .83rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .dash-list li:last-child {
+      border-bottom: none
+    }
+
+    /* ── CASES ── */
+    .case-card {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 15px;
+      margin-bottom: 13px
+    }
+
+    .case-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 8px;
+      flex-wrap: wrap
+    }
+
+    .case-title {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: .9rem
+    }
+
+    .sp-pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 500
+    }
+
+    .sp-pill.active {
+      background: var(--s-bg);
+      color: var(--s-fg)
+    }
+
+    .sp-pill.review {
+      background: var(--w-bg);
+      color: var(--w-fg)
+    }
+
+    .sp-pill.closed {
+      background: var(--d-bg);
+      color: var(--d-fg)
+    }
+
+    .case-date {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-bottom: 7px
+    }
+
+    .case-notes {
+      font-size: .82rem;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 9px
+    }
+
+    .case-acts {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap
+    }
+
+    .btn-sm {
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: .75rem;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-sm:hover {
+      border-color: var(--primary);
+      color: var(--primary)
+    }
+
+    .btn-sm.danger:hover {
+      border-color: #c0392b;
+      color: #c0392b
+    }
+
+    /* ── REFERRAL ── */
+    .ref-preview {
+      background: #f7f8ff;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 15px;
+      margin-top: 13px;
+      font-size: .82rem;
+      line-height: 1.68;
+      color: var(--text);
+      white-space: pre-wrap;
+      min-height: 56px
+    }
+
+    .ref-acts {
+      display: flex;
+      gap: 7px;
+      margin-top: 11px;
+      flex-wrap: wrap
+    }
+
+    .saved-ref {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 14px;
+      margin-bottom: 11px
+    }
+
+    .saved-ref-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px
+    }
+
+    .saved-ref-title {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: .88rem
+    }
+
+    .saved-ref-date {
+      font-size: .7rem;
+      color: var(--muted)
+    }
+
+    .saved-ref-snippet {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 8px
+    }
+
+    .saved-ref-acts {
+      display: flex;
+      gap: 6px
+    }
+
+    /* ── COMMUNITY ── */
+    .post-card {
+      background: #fff;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 15px;
+      margin-bottom: 13px
+    }
+
+    .post-cat {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: .7rem;
+      background: rgba(0, 51, 102, .07);
+      color: var(--primary);
+      margin-bottom: 7px
+    }
+
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 9px
+    }
+
+    .post-author {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: .82rem
+    }
+
+    .post-date {
+      font-size: .7rem;
+      color: var(--muted)
+    }
+
+    .post-body {
+      font-size: .83rem;
+      line-height: 1.58;
+      color: var(--text);
+      margin-bottom: 11px
+    }
+
+    .post-acts {
+      display: flex;
+      gap: 16px;
+      align-items: center
+    }
+
+    .pa {
+      font-size: .78rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .2s;
+      user-select: none
+    }
+
+    .pa:hover,
+    .pa.on {
+      color: var(--primary)
+    }
+
+    .replies {
+      margin-top: 11px;
+      padding-top: 11px;
+      border-top: 1px solid var(--border);
+      display: none
+    }
+
+    .replies.on {
+      display: block
+    }
+
+    .reply {
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 9px 11px;
+      margin-bottom: 5px;
+      font-size: .8rem;
+      line-height: 1.48
+    }
+
+    .reply .ra {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1px;
+      font-size: .76rem
+    }
+
+    .ri-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 7px
+    }
+
+    .ri-row input {
+      flex: 1;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: .8rem;
+      outline: none
+    }
+
+    .ri-row input:focus {
+      border-color: var(--primary)
+    }
+
+    .ri-row button {
+      padding: 6px 13px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: .76rem;
+      cursor: pointer
+    }
+
+    /* ── EMPTY ── */
+    .empty {
+      text-align: center;
+      padding: 44px 18px;
+      color: var(--muted);
+      font-size: .86rem
+    }
+
+    .empty p {
+      margin-bottom: 3px
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:680px) {
+      .sg {
+        grid-template-columns: 1fr
+      }
+
+      header h1 {
+        font-size: 1.25rem;
+        flex-direction: column;
+        gap: 4px
+      }
+
+      .ai-input-row {
+        flex-direction: column
+      }
+
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch
+      }
+
+      .modal {
+        padding: 18px 14px
+      }
+
+      .dash-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast-wrap" id="tw"></div>
+
+  <header>
+    <h1>Australian Social Work Tools Library</h1>
+    <p>Evidence-informed tools and frameworks for Australian social work practice</p>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ── SEARCH ASSISTANT ── -->
+    <section class="ai-panel">
+      <div class="ai-top">
+        <div class="ai-icon">🔍</div>
+        <div class="ai-top-title">Search Assistant</div>
+      </div>
+      <div class="ai-input-row">
+        <input type="text" id="aiInput" class="ai-input" placeholder="Search for tools by name, domain, or keyword…" />
+        <button id="aiSubmit" class="ai-btn">Search</button>
+      </div>
+      <div class="qps">
+        <button class="qp"
+          data-prompt="What tools should I use for a first home visit under child protection legislation in Victoria?">VIC
+          child protection visit</button>
+        <button class="qp" data-prompt="I need help with NDIS plan review and implementation tools">NDIS plan
+          tools</button>
+        <button class="qp"
+          data-prompt="Recommend trauma-informed approaches compliant with Australian practice standards">Trauma-informed
+          practice</button>
+        <button class="qp" data-prompt="What risk assessment frameworks align with ROSH guidelines?">ROSH
+          assessment</button>
+      </div>
+      <div id="aiResp" class="ai-resp">
+        <div id="aiBody"></div>
+      </div>
+    </section>
+
+
+    <!-- ── BROWSE TOOLS (MAIN SECTION) ── -->
+    <div id="pane-tools" class="pane on">
+
+      <!-- Resource Access Notice (moved here for visibility) -->
+      <div
+        style="background: #fff9e6; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: start; gap: 10px;">
+          <span style="font-size: 1.1rem; flex-shrink: 0;">ℹ️</span>
+          <div>
+            <p style="font-size: .82rem; color: #92400e; margin: 0; line-height: 1.5;">
+              <strong>Resource Access Notice:</strong> We strive to provide direct links to specific resources. However,
+              websites occasionally update their structure. If a link doesn't take you directly to the intended
+              resource, please navigate through the organisation's main website to locate the relevant content.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sg">
+        <input type="search" id="searchInput" placeholder="Search by name, purpose or keyword…" />
+        <select id="domainFilter">
+          <option value="">All practice areas</option>
+          <option value="Child Protection">Child Protection</option>
+          <option value="Disability Services">Disability Services</option>
+          <option value="Aged Care">Aged Care</option>
+          <option value="Mental Health">Mental Health</option>
+          <option value="Family Services">Family Services</option>
+          <option value="Aboriginal & Torres Strait Islander">Aboriginal &amp; Torres Strait Islander</option>
+        </select>
+        <select id="formatFilter">
+          <option value="">All formats</option>
+          <option value="Risk Assessment">Risk Assessment</option>
+          <option value="Checklist">Checklist</option>
+          <option value="Framework">Framework</option>
+          <option value="Guide">Practice Guide</option>
+          <option value="Template">Template</option>
+        </select>
+      </div>
+      <div class="pills" id="pills"></div>
+      <div class="meta" id="meta"></div>
+      <div class="grid" id="toolsGrid"></div>
+      <div class="empty" id="emptyTools" style="display:none">No tools match your filters. Try the AI assistant above!
+      </div>
+    </div>
+
+    <!-- ── PROFESSIONAL RESOURCE LIBRARY ── -->
+    <section
+      style="background: linear-gradient(135deg, #f8f9ff 0%, #e8f4f8 100%); border-radius: var(--r); padding: 28px 24px; margin-top: 32px; margin-bottom: 28px; border: 1px solid #d0e4f7;">
+      <h2 style="color: #0066cc; font-size: 1.35rem; margin-bottom: 12px; text-align: center;">Professional Resource
+        Library</h2>
+      <p style="text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 16px; line-height: 1.6;">
+        Access curated collections of evidence-based resources, academic research, and professional guidance to support
+        your practice and professional development.</p>
+
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <button class="rec-filter" data-filter="trauma"
+          style="padding: 12px 18px; border-radius: 8px; border: 2px solid #e0e7ff; background: #fff; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; font-size: .88rem;">
+          <span style="font-size: 1.3rem;">🎯</span>
+          <span style="font-weight: 500;">Trauma-informed guidance</span>
+        </button>
+        <button class="rec-filter" data-filter="compliance"
+          style="padding: 12px 18px; border-radius: 8px; border: 2px solid #e0e7ff; background: #fff; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; font-size: .88rem;">
+          <span style="font-size: 1.3rem;">📋</span>
+          <span style="font-weight: 500;">Australian compliance</span>
+        </button>
+        <button class="rec-filter" data-filter="best-practice"
+          style="padding: 12px 18px; border-radius: 8px; border: 2px solid #e0e7ff; background: #fff; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; font-size: .88rem;">
+          <span style="font-size: 1.3rem;">✨</span>
+          <span style="font-weight: 500;">Best-practice standards</span>
+        </button>
+      </div>
+
+      <div id="recResults" style="display: none; margin-top: 24px;">
+        <div style="background: #f0f4ff; border-radius: 8px; padding: 18px; margin-bottom: 16px;">
+          <h3 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 10px; text-align: center;">Recommended
+            Resources</h3>
+          <p id="recContext" style="text-align: center; font-size: .85rem; color: var(--muted); margin-bottom: 4px;">
+          </p>
+        </div>
+
+        <div style="background: #fff; border-radius: 8px; padding: 18px; border: 1px solid #e0e7ff;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <span style="font-size: 1.2rem;">💡</span>
+            <h4 style="color: #0066cc; font-size: .95rem; margin: 0;">Practice Guidance</h4>
+          </div>
+          <p id="recGuidance" style="font-size: .85rem; line-height: 1.6; color: var(--text); margin-bottom: 12px;"></p>
+          <div id="recToolsList" style="margin-top: 12px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROFESSIONAL EVENTS & NETWORKING ── -->
+    <section
+      style="background: #fff; border-radius: var(--r); padding: 28px 24px; margin-top: 32px; margin-bottom: 28px; border: 1px solid #e0e7ff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+        <div>
+          <h2
+            style="color: #0066cc; font-size: 1.35rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.4rem;">📅</span>
+            Professional Events & Networking
+          </h2>
+          <p style="color: var(--muted); font-size: .88rem; margin: 0;">Stay connected with upcoming conferences,
+            workshops, and professional development opportunities</p>
+        </div>
+      </div>
+
+      <div id="eventsGrid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 20px;">
+        <!-- Events will be populated by JavaScript -->
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+        <p style="font-size: .85rem; color: var(--muted); margin-bottom: 12px;">Find more events and networking
+          opportunities</p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a href="https://www.aasw.asn.au/events" target="_blank" rel="noopener"
+            style="padding: 8px 18px; border-radius: 999px; background: #f0f4ff; color: var(--primary); text-decoration: none; font-size: .82rem; font-weight: 500; transition: all .2s;">AASW
+            Events →</a>
+          <a href="https://www.eventbrite.com.au/d/australia/social-work/" target="_blank" rel="noopener"
+            style="padding: 8px 18px; border-radius: 999px; background: #f0f4ff; color: var(--primary); text-decoration: none; font-size: .82rem; font-weight: 500; transition: all .2s;">Eventbrite
+            →</a>
+          <a href="https://www.acwa.asn.au/events/" target="_blank" rel="noopener"
+            style="padding: 8px 18px; border-radius: 999px; background: #f0f4ff; color: var(--primary); text-decoration: none; font-size: .82rem; font-weight: 500; transition: all .2s;">ACWA
+            Events →</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER DISCLAIMER ── -->
+  <footer style="background:#0d1e2e;color:rgba(255,255,255,.75);padding:32px 16px;margin-top:48px">
+    <div style="max-width:1100px;margin:0 auto">
+      <p style="font-size:.88rem;line-height:1.65;margin-bottom:18px;text-align:center">This toolkit provides
+        evidence-informed guidance for professional social workers in Australia. Always consult relevant legislation,
+        organisational policies, and professional supervision when making practice decisions.</p>
+
+      <div
+        style="background:rgba(0,132,61,.12);border:1px solid rgba(0,132,61,.25);border-radius:10px;padding:22px;margin-bottom:18px">
+        <h3 style="color:#5ce1a5;font-size:.95rem;margin-bottom:14px">⚠️ Additional Considerations</h3>
+        <ul style="list-style:none;padding:0;margin:0;font-size:.85rem;line-height:1.75">
+          <li style="margin-bottom:9px;padding-left:20px;position:relative">
+            <span style="position:absolute;left:0">→</span>
+            Always consult with your supervisor when implementing new assessment tools or frameworks
+          </li>
+          <li style="margin-bottom:9px;padding-left:20px;position:relative">
+            <span style="position:absolute;left:0">→</span>
+            Ensure you have appropriate training before using specialized assessment or intervention tools
+          </li>
+          <li style="margin-bottom:9px;padding-left:20px;position:relative">
+            <span style="position:absolute;left:0">→</span>
+            Consider the cultural appropriateness of tools for the specific clients and communities you work with
+          </li>
+          <li style="margin-bottom:9px;padding-left:20px;position:relative">
+            <span style="position:absolute;left:0">→</span>
+            Risk assessment tools should be used as part of comprehensive assessment, not in isolation
+          </li>
+          <li style="padding-left:20px;position:relative">
+            <span style="position:absolute;left:0">→</span>
+            Screening tools identify potential concerns but are not diagnostic instruments
+          </li>
+        </ul>
+      </div>
+
+      <p style="font-size:.78rem;color:rgba(255,255,255,.55);text-align:center">Australian Social Work Tools Library ©
+        2026</p>
+    </div>
+  </footer>
+
+
+  <!-- ── MODAL ── -->
+  <div class="mo" id="mo">
+    <div class="modal"><button class="mc" id="mc">×</button>
+      <div id="mb"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       DATA
+       ============================================================ */
+    const TOOLS = [
+      { id: 1, name: "ROSH Assessment Tool", domain: "Child Protection", format: "Risk Assessment", level: "Statutory", state: "NSW", description: "Risk of Significant Harm assessment framework aligned with Children and Young Persons (Care and Protection) Act 1998 (NSW).", tags: ["ROSH", "child protection", "risk", "statutory"], source: "NSW Dept of Communities & Justice", link: "https://www.dcj.nsw.gov.au/children-and-families/child-protection/casework-practice/risk-assessment-rosh" },
+      { id: 2, name: "NDIS Plan Implementation Checklist", domain: "Disability Services", format: "Checklist", level: "Best practice", state: "National", description: "Comprehensive checklist for implementing NDIS plans, including reasonable and necessary supports and plan management options.", tags: ["NDIS", "disability", "plan", "implementation"], source: "NDIA Practice Resource", link: "https://www.ndis.gov.au/participants/using-your-plan/implementing-your-plan" },
+      { id: 3, name: "Aboriginal Child Placement Principle Guide", domain: "Aboriginal & Torres Strait Islander", format: "Framework", level: "Statutory", state: "National", description: "Framework ensuring compliance with the Aboriginal Child Placement Principle across all Australian jurisdictions.", tags: ["ACPP", "Aboriginal", "Torres Strait Islander", "cultural safety"], source: "SNAICC Resource", link: "https://www.snaicc.org.au/the-aboriginal-and-torres-strait-islander-child-placement-principle/" },
+      { id: 4, name: "Family Violence Risk Assessment (MARAM)", domain: "Family Services", format: "Risk Assessment", level: "Statutory", state: "VIC", description: "Multi-Agency Risk Assessment and Management Framework for family violence in Victoria.", tags: ["family violence", "MARAM", "risk", "Victoria"], source: "Family Safety Victoria", link: "https://www.vic.gov.au/family-violence-support" },
+      { id: 5, name: "Mental Health Act Assessment Tool", domain: "Mental Health", format: "Guide", level: "Statutory", state: "QLD", description: "Assessment guide for involuntary treatment orders under the Mental Health Act 2016 (QLD).", tags: ["mental health", "involuntary treatment", "QLD", "statutory"], source: "Queensland Health", link: "https://www.health.qld.gov.au/clinical-practice/guidelines-procedures/clinical-staff/mental-health/act" },
+      { id: 6, name: "Aged Care Quality Standards Compliance Checklist", domain: "Aged Care", format: "Checklist", level: "Statutory", state: "National", description: "Checklist ensuring compliance with the Aged Care Quality Standards and supporting best practice in residential and home care.", tags: ["aged care", "quality standards", "compliance"], source: "Aged Care Quality & Safety Commission", link: "https://www.agedcarequality.gov.au/providers/assessment-against-standards" },
+      { id: 7, name: "Signs of Safety Framework", domain: "Child Protection", format: "Framework", level: "Best practice", state: "National", description: "Strengths-based, safety-organised approach to child protection casework widely adopted across Australian jurisdictions.", tags: ["Signs of Safety", "strengths-based", "child protection"], source: "Signs of Safety Australia", link: "https://www.signsofsafety.net/practice-tools" },
+      { id: 8, name: "Mandatory Reporting Guide", domain: "Child Protection", format: "Guide", level: "Statutory", state: "National", description: "State-by-state guide to mandatory reporting obligations, thresholds, and processes for suspected child abuse and neglect.", tags: ["mandatory reporting", "child abuse", "statutory"], source: "Australian Institute of Family Studies", link: "https://aifs.gov.au/resources/resource-sheets/mandatory-reporting-child-abuse-and-neglect" },
+      { id: 9, name: "Trauma-Informed Care Framework", domain: "Mental Health", format: "Framework", level: "Best practice", state: "National", description: "Australian-contextualised framework for delivering trauma-informed care across mental health and community services.", tags: ["trauma", "trauma-informed", "mental health"], source: "Blue Knot Foundation", link: "https://www.blueknot.org.au/workers-practitioners/for-health-professionals/trauma-informed-care-and-practice/" },
+      { id: 10, name: "Out-of-Home Care Case Plan Template", domain: "Child Protection", format: "Template", level: "Statutory", state: "VIC", description: "Comprehensive case plan template for children in out-of-home care, meeting Victorian legislative requirements.", tags: ["OOHC", "case plan", "foster care", "kinship care"], source: "Victorian Dept of Families", link: "https://www.dffh.vic.gov.au/publications/out-home-care-manual" },
+      { id: 11, name: "Suicide Risk Assessment Protocol", domain: "Mental Health", format: "Risk Assessment", level: "Best practice", state: "National", description: "Evidence-based protocol for assessing and managing suicide risk in community and clinical settings.", tags: ["suicide", "risk assessment", "mental health", "crisis"], source: "Lifeline Australia", link: "https://www.lifeline.org.au/resources/suicide-prevention-resources" },
+      { id: 12, name: "Cultural Safety Self-Assessment Tool", domain: "Aboriginal & Torres Strait Islander", format: "Checklist", level: "Best practice", state: "National", description: "Reflective tool to assess and improve cultural safety in practice with Aboriginal and Torres Strait Islander peoples.", tags: ["cultural safety", "Aboriginal", "Torres Strait Islander"], source: "AASW Practice Standards", link: "https://www.aasw.asn.au/practitioner-resources/cultural-diversity-resources" }
+    ];
+
+    /* ============================================================
+       SEED DATA
+       ============================================================ */
+    const SEED_POSTS = [
+      { id: 1001, category: "Best Practice", content: "Just completed my first MARAM assessment in VIC. The framework is incredibly thorough — really helped me articulate risk factors clearly for the safety plan. Highly recommend the Family Safety Victoria training if you haven't done it yet.", author: "Sarah M.", createdAt: "2026-01-28T09:15:00", likes: 12, replies: [{ author: "James K.", text: "Agreed — pairing MARAM with Signs of Safety gave a really balanced view.", ts: "2026-01-28T11:30:00" }] },
+      { id: 1002, category: "Question", content: "Has anyone used the Cultural Safety Self-Assessment Tool with their team? We're looking to embed it into our supervision process but unsure how best to structure the conversation around it.", author: "Rebecca T.", createdAt: "2026-01-30T14:22:00", likes: 7, replies: [] },
+      { id: 1003, category: "Resource", content: "Reminder: the AIFS mandatory reporting resource has been updated for 2026. Worth a quick review — thresholds differ quite a bit between states.", author: "David L.", createdAt: "2026-01-31T08:45:00", likes: 19, replies: [{ author: "Karen W.", text: "Thanks David. NSW thresholds changed significantly — worth flagging to your whole team.", ts: "2026-01-31T10:10:00" }] }
+    ];
+    const SEED_CASES = [
+      { id: 9001, title: "Johnson Family – Child Protection Assessment", toolIds: [1, 7], notes: "Initial ROSH assessment completed. Signs of Safety mapping underway. Next review due 15 Feb.", status: "active", createdAt: "2026-01-24T10:00:00" },
+      { id: 9002, title: "Williams – NDIS Plan Review", toolIds: [2], notes: "Plan review meeting held. Awaiting revised support catalogue from plan manager.", status: "review", createdAt: "2026-01-20T14:30:00" },
+      { id: 9003, title: "Chen – Out-of-Home Care Placement", toolIds: [10, 3], notes: "OOHC case plan finalised. Aboriginal Child Placement Principle compliance confirmed with SNAICC.", status: "closed", createdAt: "2026-01-15T09:00:00" }
+    ];
+    const SEED_REFS = [
+      { id: 8001, title: "Referral to Lifeline – Crisis Support", to: "Lifeline Australia", domain: "Mental Health", snippet: "Urgent referral for crisis intervention following suicide risk assessment.", createdAt: "2026-01-29T11:00:00", fullText: "REFERRAL LETTER\n────────────────────────────────────────\n\nDate:              29 January 2026\nFrom:              Sarah Mitchell\nAgency:            NSW DCJ\nTo:                Lifeline Australia\nClient Initials:   T.W.\nPractice Area:     Mental Health\n\n────────────────────────────────────────\nREASON FOR REFERRAL\n────────────────────────────────────────\n\nUrgent referral for crisis intervention following suicide risk assessment conducted on 28 January 2026. Client presented with elevated risk indicators.\n\n────────────────────────────────────────\nTOOLS & FRAMEWORKS USED\n────────────────────────────────────────\n\n  1. Suicide Risk Assessment Protocol\n\n────────────────────────────────────────\n\nThis referral was prepared using the Australian Social Work Tools Library.\nSarah Mitchell\nNSW DCJ" }
+    ];
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let S = { favourites: [], cases: [...SEED_CASES], posts: [...SEED_POSTS], refs: [...SEED_REFS], activePill: null, aiRecIds: [] };
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    function toast(m, t = '') { const w = document.getElementById('tw'), e = document.createElement('div'); e.className = 'toast ' + t; e.textContent = m; w.appendChild(e); requestAnimationFrame(() => e.classList.add('show')); setTimeout(() => { e.classList.remove('show'); setTimeout(() => e.remove(), 320) }, 2200) }
+
+    /* ============================================================
+       TABS
+       ============================================================ */
+    // No tab switching needed - only one tab (Browse Tools) is visible
+
+    /* ============================================================
+       SMART SEARCH
+       ============================================================ */
+    document.querySelectorAll('.qp').forEach(b => b.addEventListener('click', () => { document.getElementById('aiInput').value = b.dataset.prompt; runSmartSearch() }));
+    document.getElementById('aiSubmit').addEventListener('click', runSmartSearch);
+    document.getElementById('aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') runSmartSearch() });
+
+    function runSmartSearch() {
+      const q = document.getElementById('aiInput').value.trim(); if (!q) return;
+      const btn = document.getElementById('aiSubmit'), resp = document.getElementById('aiResp'), body = document.getElementById('aiBody');
+      btn.disabled = true; resp.className = 'ai-resp on';
+
+      // Enhanced smart matching with more specific patterns
+      const results = enhancedSmartMatch(q);
+
+      if (results.length > 0) {
+        S.aiRecIds = results.map(t => t.id);
+
+        // Generate helpful, specific response
+        let response = `<p><strong>Found ${results.length} relevant tool${results.length > 1 ? 's' : ''} for your query:</strong></p>`;
+        response += '<ul style="margin: 10px 0; padding-left: 20px;">';
+        results.forEach(t => {
+          response += `<li style="margin-bottom: 8px;"><strong>${t.name}</strong> – ${t.description.substring(0, 100)}${t.description.length > 100 ? '...' : ''}</li>`;
+        });
+        response += '</ul>';
+        response += '<p><em>These tools are highlighted below. Click "Open tool" to access the specific resource.</em></p>';
+        response += '<span class="clear-ai" id="clearAI">Clear recommendations</span>';
+
+        body.innerHTML = response;
+        document.getElementById('clearAI').addEventListener('click', clearSearch);
+        renderTools();
+      } else {
+        // No exact matches - suggest browsing
+        S.aiRecIds = [];
+        body.innerHTML = `<p><strong>No exact matches found.</strong></p><p>Try browsing by practice area or use keywords like "ROSH", "NDIS", "MARAM", "trauma", "Aboriginal", or "mandatory reporting".</p>`;
+        renderTools();
+      }
+
+      btn.disabled = false;
+    }
+
+    function clearSearch() {
+      S.aiRecIds = [];
+      document.getElementById('aiResp').className = 'ai-resp';
+      renderTools();
+    }
+
+    function enhancedSmartMatch(q) {
+      const l = q.toLowerCase();
+      const matches = [];
+
+      // Comprehensive keyword mapping with priority scoring
+      const patterns = [
+        // ROSH and Child Protection
+        { kw: ['rosh', 'risk of significant harm', 'significant harm'], ids: [1], priority: 10 },
+        { kw: ['signs of safety'], ids: [7], priority: 10 },
+        { kw: ['mandatory reporting', 'reporting obligations', 'report abuse'], ids: [8], priority: 10 },
+        { kw: ['out-of-home', 'oohc', 'foster care', 'kinship care', 'case plan template'], ids: [10], priority: 10 },
+        { kw: ['child protection', 'child abuse', 'child safety'], ids: [1, 7, 8], priority: 5 },
+
+        // NDIS and Disability
+        { kw: ['ndis', 'national disability insurance'], ids: [2], priority: 10 },
+        { kw: ['disability', 'plan implementation', 'reasonable and necessary'], ids: [2], priority: 7 },
+
+        // Aboriginal and Torres Strait Islander
+        { kw: ['aboriginal child placement', 'acpp', 'placement principle'], ids: [3], priority: 10 },
+        { kw: ['cultural safety', 'cultural competence'], ids: [12], priority: 10 },
+        { kw: ['aboriginal', 'torres strait islander', 'indigenous'], ids: [3, 12], priority: 5 },
+
+        // Family Violence
+        { kw: ['maram', 'family violence', 'domestic violence', 'family safety victoria'], ids: [4], priority: 10 },
+
+        // Mental Health
+        { kw: ['suicide risk', 'suicide assessment', 'suicide prevention'], ids: [11], priority: 10 },
+        { kw: ['mental health act', 'involuntary treatment', 'involuntary order'], ids: [5], priority: 10 },
+        { kw: ['trauma-informed', 'trauma informed care'], ids: [9], priority: 10 },
+        { kw: ['mental health', 'crisis'], ids: [5, 9, 11], priority: 5 },
+
+        // Aged Care
+        { kw: ['aged care', 'quality standards', 'elderly care'], ids: [6], priority: 10 },
+
+        // State-specific
+        { kw: ['victoria', 'vic'], ids: [4, 10], priority: 3 },
+        { kw: ['nsw', 'new south wales'], ids: [1], priority: 3 },
+        { kw: ['queensland', 'qld'], ids: [5], priority: 3 },
+
+        // Format-specific
+        { kw: ['template', 'case plan'], ids: [10], priority: 8 },
+        { kw: ['checklist'], ids: [2, 6, 12], priority: 6 },
+        { kw: ['risk assessment', 'assessment tool'], ids: [1, 4, 11], priority: 6 },
+        { kw: ['framework', 'practice framework'], ids: [3, 4, 7, 9], priority: 5 },
+        { kw: ['guide', 'practice guide'], ids: [5, 8], priority: 5 }
+      ];
+
+      // Score each tool based on keyword matches
+      const scores = {};
+      patterns.forEach(pattern => {
+        if (pattern.kw.some(k => l.includes(k))) {
+          pattern.ids.forEach(id => {
+            scores[id] = (scores[id] || 0) + pattern.priority;
+          });
+        }
+      });
+
+      // Get tools sorted by score (highest first)
+      const scoredTools = Object.entries(scores)
+        .sort((a, b) => b[1] - a[1])
+        .map(([id]) => TOOLS.find(t => t.id === parseInt(id)))
+        .filter(Boolean);
+
+
+      // Return top 5 matches
+      return scoredTools.slice(0, 5);
+    }
+
+    /* ============================================================
+       RECOMMENDATION FEATURE - DISTINCT RESOURCE CATEGORIES
+       ============================================================ */
+    const RECOMMENDATIONS = {
+      trauma: {
+        context: "For Trauma-Informed Practice",
+        guidance: "Evidence-based resources and frameworks to support trauma-informed approaches in social work practice. These resources provide practical guidance for working with clients who have experienced trauma.",
+        resources: [
+          { name: "Blue Knot Foundation - Trauma-Informed Care and Practice", type: "Framework", description: "Comprehensive framework for delivering trauma-informed care across mental health and community services in Australia.", link: "https://www.blueknot.org.au/workers-practitioners/for-health-professionals/trauma-informed-care-and-practice/the-blue-knot-foundation-approach/" },
+          { name: "Australian Childhood Foundation - Making SPACE for Learning", type: "Practice Guide", description: "Trauma-informed framework for understanding and responding to childhood trauma in educational and practice settings.", link: "https://www.childhood.org.au/app/uploads/2019/03/Making-SPACE-for-Learning-Guide.pdf" },
+          { name: "Phoenix Australia - Guidelines for Trauma-Informed Practice", type: "Clinical Guide", description: "Evidence-based clinical guidelines for trauma recovery and psychological first aid from Australia's national centre of excellence.", link: "https://www.phoenixaustralia.org/recovery-after-trauma/" },
+          { name: "Emerging Minds - Trauma-Informed Practice with Children", type: "Resource Library", description: "Practical resources for understanding how trauma affects children's mental health and development, with evidence-based strategies.", link: "https://emergingminds.com.au/resources/supporting-children-who-have-experienced-trauma/" },
+          { name: "SAMHSA - Trauma-Informed Approach Framework", type: "Implementation Guide", description: "Six key principles of trauma-informed approaches with implementation guidance for service delivery systems.", link: "https://www.samhsa.gov/trauma-violence/key-principles" },
+          { name: "National Child Traumatic Stress Network - Trauma Types", type: "Resource Centre", description: "Comprehensive resources on different types of trauma and evidence-based interventions for children and families.", link: "https://www.nctsn.org/what-is-child-trauma/trauma-types" }
+        ]
+      },
+      compliance: {
+        context: "For Australian Statutory Compliance",
+        guidance: "Official government resources, legislation guides, and compliance frameworks to ensure your practice meets Australian statutory requirements and mandatory obligations.",
+        resources: [
+          { name: "AIFS - Mandatory Reporting of Child Abuse and Neglect", type: "Legislative Guide", description: "Comprehensive state-by-state guide to mandatory reporting laws, thresholds, and obligations across all Australian jurisdictions.", link: "https://aifs.gov.au/resources/policy-and-practice-papers/mandatory-reporting-child-abuse-and-neglect" },
+          { name: "NSW DCJ - Child Protection Casework Practice", type: "Statutory Framework", description: "Official casework practice guidance including risk assessment, case planning, and statutory intervention requirements.", link: "https://www.dcj.nsw.gov.au/children-and-families/child-protection/casework-practice.html" },
+          { name: "Victorian DFFH - Child Protection Practice Manual", type: "Practice Manual", description: "Comprehensive practice manual covering all aspects of Victorian child protection statutory work and legislative requirements.", link: "https://www.dffh.vic.gov.au/publications/child-protection-manual-0" },
+          { name: "NDIS Commission - Practice Standards and Quality Indicators", type: "Compliance Framework", description: "Official NDIS Practice Standards with detailed quality indicators and compliance requirements for registered providers.", link: "https://www.ndiscommission.gov.au/providers/registered-ndis-providers/ndis-practice-standards-and-quality-indicators" },
+          { name: "Aged Care Quality Standards - Assessment Process", type: "Quality Standards", description: "Detailed guide to the eight Aged Care Quality Standards and the assessment process for service providers.", link: "https://www.agedcarequality.gov.au/providers/assessment-processes" },
+          { name: "Family Safety Victoria - MARAM Practice Guides", type: "Risk Assessment Framework", description: "Comprehensive MARAM practice guides for identifying, assessing, and managing family violence risk across all sectors.", link: "https://www.vic.gov.au/maram-practice-guides-and-resources" }
+        ]
+      },
+      'best-practice': {
+        context: "For Evidence-Based Practice & Academic Research",
+        guidance: "Peer-reviewed research, academic journals, and evidence-based practice guides to support professional development and inform contemporary social work practice. Essential resources for students and practitioners.",
+        resources: [
+          { name: "Australian Social Work Journal - Current Issue", type: "Academic Journal", description: "Latest peer-reviewed research on contemporary social work practice, policy, and education in Australia and the Asia-Pacific region.", link: "https://www.tandfonline.com/toc/rasw20/current" },
+          { name: "Trauma-Informed Practice in Child Protection", type: "Research Article", description: "Evidence-based approaches to trauma-informed practice in Australian child protection contexts (Open Access).", link: "https://www.tandfonline.com/doi/full/10.1080/0312407X.2023.2176733" },
+          { name: "AASW - Practice Standards 2013", type: "Professional Standards", description: "Australian Association of Social Workers comprehensive practice standards for quality social work service delivery.", link: "https://www.aasw.asn.au/document/item/4551" },
+          { name: "Campbell Collaboration - Social Welfare Systematic Reviews", type: "Evidence Library", description: "High-quality systematic reviews and evidence syntheses on social welfare interventions, programs, and policies.", link: "https://www.campbellcollaboration.org/library/social-welfare-title.html" },
+          { name: "California Evidence-Based Clearinghouse for Child Welfare", type: "Research Database", description: "Comprehensive ratings and reviews of evidence-based programs and practices in child welfare and child protection.", link: "https://www.cebc4cw.org/program/" },
+          { name: "Journal of Social Work Practice - Latest Articles", type: "Academic Journal", description: "International journal publishing cutting-edge research on social work practice, theory, and professional development.", link: "https://www.tandfonline.com/journals/cjsw20" },
+          { name: "AIFS - Research and Evaluation", type: "Research Centre", description: "Evidence-based research, data, and evaluation on families, children, and communities to inform Australian policy and practice.", link: "https://aifs.gov.au/research/research-and-evaluation" },
+          { name: "Signs of Safety - Approach to Implementation", type: "Practice Research", description: "Research evidence, implementation science, and evaluation studies on the Signs of Safety approach in child protection.", link: "https://www.signsofsafety.net/approach-to-implementation/" }
+        ]
+      }
+    };
+
+    document.querySelectorAll('.rec-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+        const rec = RECOMMENDATIONS[filter];
+
+        // Update active state
+        document.querySelectorAll('.rec-filter').forEach(b => {
+          b.style.borderColor = '#e0e7ff';
+          b.style.background = '#fff';
+        });
+        btn.style.borderColor = '#0066cc';
+        btn.style.background = '#f0f4ff';
+
+        // Show results
+        document.getElementById('recResults').style.display = 'block';
+        document.getElementById('recContext').textContent = rec.context;
+        document.getElementById('recGuidance').textContent = rec.guidance;
+
+        // Build resources list
+        const resourcesList = rec.resources.map(resource => {
+          return `
+            <div style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; font-size: .9rem; color: var(--primary); margin-bottom: 4px;">${resource.name}</div>
+                  <div style="font-size: .8rem; color: var(--muted); margin-bottom: 6px; line-height: 1.5;">${resource.description}</div>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-size: .7rem; padding: 3px 8px; border-radius: 999px; background: rgba(0,51,102,.08); color: var(--primary); font-weight: 500;">${resource.type}</span>
+                  </div>
+                </div>
+                <a href="${resource.link}" target="_blank" rel="noopener" style="padding: 7px 16px; border-radius: 999px; border: none; background: var(--primary); color: #fff; font-size: .78rem; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0; font-weight: 500;">Access resource ↗</a>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('recToolsList').innerHTML = resourcesList;
+
+        // Scroll to results
+        document.getElementById('recResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+
+    /* ============================================================
+       PROFESSIONAL EVENTS & NETWORKING
+       ============================================================ */
+    const EVENTS = [
+      {
+        title: "AASW NSW Branch - Supervision in Social Work Practice",
+        date: "14 February 2026",
+        location: "Online Webinar",
+        type: "Workshop",
+        description: "Professional development workshop exploring contemporary approaches to supervision in social work practice. Suitable for supervisors and supervisees.",
+        link: "https://www.aasw.asn.au/events",
+        organiser: "AASW NSW"
+      },
+      {
+        title: "Child Protection Workers Forum - March 2026",
+        date: "18 March 2026",
+        location: "Brisbane, QLD",
+        type: "Forum",
+        description: "Quarterly forum for child protection practitioners to discuss current practice challenges, legislative updates, and case consultation.",
+        link: "https://www.acwa.asn.au/events/",
+        organiser: "ACWA"
+      },
+      {
+        title: "Trauma-Informed Care Workshop Series",
+        date: "Ongoing - Next: 25 February 2026",
+        location: "Melbourne & Online",
+        type: "Workshop",
+        description: "Monthly professional development workshops on implementing trauma-informed approaches. Accredited for CPD hours.",
+        link: "https://www.blueknot.org.au/training-services/",
+        organiser: "Blue Knot Foundation"
+      }
+    ];
+
+    function renderEvents() {
+      const grid = document.getElementById('eventsGrid');
+      const eventCards = EVENTS.map(event => `
+        <div style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); border: 1px solid #e0e7ff; border-radius: 12px; padding: 20px; transition: all .3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px rgba(0,102,204,0.12)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <span style="font-size: .7rem; padding: 4px 10px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; text-transform: uppercase;">${event.type}</span>
+            <span style="font-size: .75rem; color: var(--muted); font-weight: 500;">📍 ${event.location}</span>
+          </div>
+          <h3 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 8px; line-height: 1.3;">${event.title}</h3>
+          <p style="font-size: .8rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5;">${event.description}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid #f0f0f0;">
+            <div>
+              <div style="font-size: .72rem; color: var(--muted); margin-bottom: 2px;">📅 ${event.date}</div>
+              <div style="font-size: .72rem; color: var(--muted);">Organised by ${event.organiser}</div>
+            </div>
+            <a href="${event.link}" target="_blank" rel="noopener" style="padding: 7px 16px; border-radius: 999px; background: var(--primary); color: #fff; text-decoration: none; font-size: .78rem; font-weight: 500; transition: all .2s;" onmouseover="this.style.background='#005299';" onmouseout="this.style.background='var(--primary)';">Learn more →</a>
+          </div>
+        </div>
+      `).join('');
+      grid.innerHTML = eventCards;
+    }
+
+
+
+    /* ============================================================
+       PILLS
+       ============================================================ */
+    const PILLS = [
+      { id: 'child-protection', label: 'Child Protection', kw: ['child protection', 'ROSH', 'mandatory reporting', 'signs of safety'] },
+      { id: 'ndis', label: 'NDIS', kw: ['NDIS', 'disability', 'plan'] },
+      { id: 'mental-health', label: 'Mental Health', kw: ['mental health', 'suicide', 'trauma'] },
+      { id: 'family-services', label: 'Family Services', kw: ['family violence', 'MARAM'] },
+      { id: 'aged-care', label: 'Aged Care', kw: ['aged care', 'quality standards'] },
+      { id: 'aboriginal', label: 'Aboriginal & TSI', kw: ['Aboriginal', 'Torres Strait Islander', 'cultural safety', 'ACPP'] }
+    ];
+
+    function renderPills() {
+      const el = document.getElementById('pills');
+      el.innerHTML = PILLS.map(p => `<button class="pill${S.activePill === p.id ? ' on' : ''}" data-pill="${p.id}">${p.label}</button>`).join('');
+      el.querySelectorAll('.pill').forEach(b => b.addEventListener('click', () => { S.activePill = S.activePill === b.dataset.pill ? null : b.dataset.pill; renderPills(); renderTools() }));
+    }
+
+    /* ============================================================
+       TOOLS
+       ============================================================ */
+    function renderTools() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase(),
+        dm = document.getElementById('domainFilter').value,
+        fm = document.getElementById('formatFilter').value,
+        pill = S.activePill ? PILLS.find(p => p.id === S.activePill) : null;
+      let list = TOOLS.filter(t => {
+        const h = (t.name + ' ' + t.description + ' ' + t.tags.join(' ')).toLowerCase();
+        if (q && !h.includes(q)) return false;
+        if (dm && t.domain !== dm) return false;
+        if (fm && t.format !== fm) return false;
+        if (pill && !pill.kw.some(k => h.includes(k.toLowerCase()))) return false;
+        return true;
+      });
+      list.sort((a, b) => (S.aiRecIds.includes(b.id) | 0) - (S.aiRecIds.includes(a.id) | 0));
+      const g = document.getElementById('toolsGrid'), emp = document.getElementById('emptyTools'), meta = document.getElementById('meta');
+      if (!list.length) { g.innerHTML = ''; emp.style.display = 'block'; meta.textContent = '0 tools found.'; return }
+      emp.style.display = 'none'; meta.textContent = list.length + ' tool' + (list.length !== 1 ? 's' : '') + ' found';
+      g.innerHTML = list.map(t => cardHTML(t)).join('');
+      wireCards(g);
+    }
+    function cardHTML(t) {
+      const rec = S.aiRecIds.includes(t.id), fav = S.favourites.includes(t.id);
+      return `<article class="card${rec ? ' ai-rec' : ''}${fav ? ' fav' : ''}">
+    <div class="card-top"><div class="card-title">${t.name}</div><div class="card-btns">
+      <button class="ib fav-btn${fav ? ' on' : ''}" data-id="${t.id}" title="Favourite">${fav ? '⭐' : '☆'}</button>
+      <button class="ib preview-btn" data-id="${t.id}" title="Preview">👁</button>
+    </div></div>
+    <div class="badges"><span class="bdg">${t.domain}</span>${t.state !== 'National' ? `<span class="bdg st">${t.state}</span>` : ''}</div>
+    <div class="card-desc">${t.description}</div>
+    <div class="tags">${[t.format, t.level, ...t.tags.slice(0, 3)].map(x => `<span class="tag">${x}</span>`).join('')}</div>
+    <div class="card-foot"><span class="src">Source: ${t.source}</span><a class="btn-open" href="${t.link}" target="_blank" rel="noopener">Open tool ↗</a></div>
+  </article>`;
+    }
+    function wireCards(container) {
+      container.querySelectorAll('.fav-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); toggleFav(+b.dataset.id) }));
+      container.querySelectorAll('.preview-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openModal(+b.dataset.id) }));
+    }
+
+    /* ============================================================
+       FAVOURITES
+       ============================================================ */
+    function toggleFav(id) {
+      const i = S.favourites.indexOf(id);
+      if (i > -1) { S.favourites.splice(i, 1); toast('Removed from favourites', 'warn') }
+      else { S.favourites.push(id); toast('Added to favourites ⭐', 'ok') }
+      renderTools();
+      if (document.getElementById('pane-favourites').classList.contains('on')) renderFavs();
+      if (document.getElementById('pane-dashboard').classList.contains('on')) renderDash();
+    }
+    function renderFavs() {
+      const g = document.getElementById('favGrid'), emp = document.getElementById('emptyFav');
+      if (!S.favourites.length) { g.innerHTML = ''; emp.style.display = 'block'; return }
+      emp.style.display = 'none';
+      g.innerHTML = S.favourites.map(id => { const t = TOOLS.find(x => x.id === id); return t ? cardHTML(t) : '' }).join('');
+      wireCards(g);
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    function openModal(id) {
+      const t = TOOLS.find(x => x.id === id); if (!t) return;
+      document.getElementById('mb').innerHTML = `<h2>${t.name}</h2>
+    <div class="badges" style="margin-bottom:11px"><span class="bdg">${t.domain}</span>${t.state !== 'National' ? `<span class="bdg st">${t.state}</span>` : ''}</div>
+    <h3>Description</h3><p>${t.description}</p>
+    <h3>Details</h3><p><strong>Format:</strong> ${t.format}<br><strong>Level:</strong> ${t.level}<br><strong>Jurisdiction:</strong> ${t.state}</p>
+    <h3>Keywords</h3><div class="tags" style="margin:7px 0">${t.tags.map(x => `<span class="tag">${x}</span>`).join('')}</div>
+    <h3>Source</h3><p>${t.source}</p>
+    <div style="margin-top:16px"><a class="btn-open" href="${t.link}" target="_blank" rel="noopener">Open Full Resource ↗</a></div>`;
+      document.getElementById('mo').classList.add('on');
+    }
+    document.getElementById('mc').addEventListener('click', () => document.getElementById('mo').classList.remove('on'));
+    document.getElementById('mo').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('on') });
+
+    /* ============================================================
+       CASES
+       ============================================================ */
+    function populateCaseTools() { document.getElementById('caseTools').innerHTML = TOOLS.map(t => `<option value="${t.id}">${t.name}</option>`).join('') }
+    let editCaseId = null;
+    document.getElementById('caseSaveBtn').addEventListener('click', () => {
+      const title = document.getElementById('caseTitle').value.trim(),
+        toolIds = [...document.getElementById('caseTools').selectedOptions].map(o => +o.value),
+        notes = document.getElementById('caseNotes').value.trim(),
+        status = document.getElementById('caseStatus').value;
+      if (!title) { toast('Please enter a case title.', 'warn'); return }
+      if (editCaseId !== null) {
+        const c = S.cases.find(x => x.id === editCaseId);
+        if (c) { c.title = title; c.toolIds = toolIds; c.notes = notes; c.status = status }
+        toast('Case updated ✓', 'ok'); editCaseId = null;
+      } else {
+        S.cases.unshift({ id: Date.now(), title, toolIds, notes, status, createdAt: new Date().toISOString() });
+        toast('Case added ✓', 'ok');
+      }
+      resetCaseForm(); renderCases();
+      if (document.getElementById('pane-dashboard').classList.contains('on')) renderDash();
+    });
+    document.getElementById('caseCancelBtn').addEventListener('click', () => { editCaseId = null; resetCaseForm() });
+    function resetCaseForm() {
+      document.getElementById('caseTitle').value = '';
+      document.getElementById('caseTools').selectedIndex = -1;
+      document.getElementById('caseNotes').value = '';
+      document.getElementById('caseStatus').value = 'active';
+      document.getElementById('caseFormTitle').textContent = 'Add New Case';
+      document.getElementById('caseSaveBtn').textContent = 'Add Case';
+      document.getElementById('caseCancelBtn').style.display = 'none';
+    }
+    function renderCases() {
+      const el = document.getElementById('casesContainer'), emp = document.getElementById('emptyCases');
+      if (!S.cases.length) { el.innerHTML = ''; emp.style.display = 'block'; return }
+      emp.style.display = 'none';
+      el.innerHTML = S.cases.map(c => {
+        const tn = c.toolIds.map(id => { const t = TOOLS.find(x => x.id === id); return t ? t.name : '' }).filter(Boolean);
+        return `<div class="case-card">
+      <div class="case-top"><span class="case-title">${c.title}</span><span class="sp-pill ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span></div>
+      <div class="case-date">Created: ${new Date(c.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+      ${c.notes ? `<div class="case-notes">${c.notes}</div>` : ''}
+      ${tn.length ? `<div class="tags" style="margin-bottom:9px">${tn.map(n => `<span class="tag">${n}</span>`).join('')}</div>` : ''}
+      <div class="case-acts">
+        <button class="btn-sm" data-action="edit" data-id="${c.id}">✏️ Edit</button>
+        <button class="btn-sm" data-action="status" data-id="${c.id}">🔄 Status</button>
+        <button class="btn-sm danger" data-action="delete" data-id="${c.id}">🗑️ Delete</button>
+      </div></div>`;
+      }).join('');
+      el.querySelectorAll('.btn-sm[data-action]').forEach(b => b.addEventListener('click', () => {
+        const id = +b.dataset.id, action = b.dataset.action, c = S.cases.find(x => x.id === id); if (!c) return;
+        if (action === 'delete') { S.cases = S.cases.filter(x => x.id !== id); toast('Case deleted.', 'warn'); renderCases(); if (document.getElementById('pane-dashboard').classList.contains('on')) renderDash(); return }
+        if (action === 'status') { const o = ['active', 'review', 'closed']; c.status = o[(o.indexOf(c.status) + 1) % o.length]; toast('Status → ' + c.status.charAt(0).toUpperCase() + c.status.slice(1), 'ok'); renderCases(); return }
+        if (action === 'edit') {
+          editCaseId = id;
+          document.getElementById('caseTitle').value = c.title;
+          const sel = document.getElementById('caseTools');[...sel.options].forEach(o => o.selected = c.toolIds.includes(+o.value));
+          document.getElementById('caseNotes').value = c.notes;
+          document.getElementById('caseStatus').value = c.status;
+          document.getElementById('caseFormTitle').textContent = 'Edit Case';
+          document.getElementById('caseSaveBtn').textContent = 'Save Changes';
+          document.getElementById('caseCancelBtn').style.display = 'inline-block';
+          document.getElementById('caseFormBox').scrollIntoView({ behavior: 'smooth' });
+        }
+      }));
+    }
+
+    /* ============================================================
+       REFERRALS
+       ============================================================ */
+    function populateRefTools() { document.getElementById('refTools').innerHTML = TOOLS.map(t => `<option value="${t.id}">${t.name}</option>`).join('') }
+    let lastRefText = '';
+    document.getElementById('refPreviewBtn').addEventListener('click', () => {
+      const pr = document.getElementById('refPractitioner').value.trim() || '[Your Name]',
+        ag = document.getElementById('refAgency').value.trim() || '[Your Agency]',
+        to = document.getElementById('refTo').value.trim() || '[Receiving Service]',
+        ini = document.getElementById('refInitials').value.trim() || '[Client Initials]',
+        dm = document.getElementById('refDomain').value || '[Practice Area]',
+        reason = document.getElementById('refReason').value.trim() || '[Please describe reason for referral]',
+        tIds = [...document.getElementById('refTools').selectedOptions].map(o => +o.value),
+        tNames = tIds.map(id => { const t = TOOLS.find(x => x.id === id); return t ? t.name : '' }).filter(Boolean),
+        notes = document.getElementById('refNotes').value.trim(),
+        today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }),
+        ln = '─'.repeat(40);
+      let txt = `REFERRAL LETTER\n${ln}\n\nDate:              ${today}\nFrom:              ${pr}\nAgency:            ${ag}\nTo:                ${to}\nClient Initials:   ${ini}\nPractice Area:     ${dm}\n\n${ln}\nREASON FOR REFERRAL\n${ln}\n\n${reason}\n`;
+      if (tNames.length) txt += `\n${ln}\nTOOLS & FRAMEWORKS USED\n${ln}\n\n` + tNames.map((n, i) => `  ${i + 1}. ${n}`).join('\n') + '\n';
+      if (notes) txt += `\n${ln}\nADDITIONAL NOTES\n${ln}\n\n${notes}\n`;
+      txt += `\n${ln}\n\nThis referral was prepared using the Australian Social Work Tools Library.\n${pr}\n${ag}`;
+      lastRefText = txt;
+      document.getElementById('refPreview').textContent = txt;
+      document.getElementById('refPreviewWrap').style.display = 'block';
+      toast('Referral preview generated ✓', 'ok');
+    });
+    document.getElementById('refCopyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(lastRefText).then(() => toast('Copied to clipboard ✓', 'ok')).catch(() => {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById('refPreview'));
+        const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        toast('Text selected — Ctrl/Cmd + C to copy', 'warn');
+      });
+    });
+    document.getElementById('refSaveBtn').addEventListener('click', () => {
+      if (!lastRefText) { toast('Preview a referral first.', 'warn'); return }
+      const to = document.getElementById('refTo').value.trim() || 'Unknown',
+        dm = document.getElementById('refDomain').value || 'General',
+        reason = document.getElementById('refReason').value.trim() || '';
+      S.refs.unshift({ id: Date.now(), title: `Referral to ${to}`, to, domain: dm, snippet: reason.slice(0, 120) + (reason.length > 120 ? '…' : ''), createdAt: new Date().toISOString(), fullText: lastRefText });
+      toast('Referral saved ✓', 'ok'); renderSavedRefs();
+      if (document.getElementById('pane-dashboard').classList.contains('on')) renderDash();
+    });
+    document.getElementById('refClearBtn').addEventListener('click', () => {
+      ['refPractitioner', 'refAgency', 'refTo', 'refInitials', 'refReason', 'refNotes'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('refDomain').value = ''; document.getElementById('refTools').selectedIndex = -1;
+      document.getElementById('refPreviewWrap').style.display = 'none'; lastRefText = '';
+      toast('Form cleared.', 'warn');
+    });
+    function renderSavedRefs() {
+      const el = document.getElementById('savedRefs'), emp = document.getElementById('emptySavedRefs');
+      if (!S.refs.length) { el.innerHTML = ''; emp.style.display = 'block'; return }
+      emp.style.display = 'none';
+      el.innerHTML = S.refs.map(r => `<div class="saved-ref">
+    <div class="saved-ref-top"><span class="saved-ref-title">${r.title}</span><span class="saved-ref-date">${new Date(r.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>
+    <div class="saved-ref-snippet">${r.snippet}</div>
+    <div class="saved-ref-acts">
+      <button class="btn-sm" data-action="view" data-id="${r.id}">👁 View</button>
+      <button class="btn-sm" data-action="copy" data-id="${r.id}">📋 Copy</button>
+      <button class="btn-sm danger" data-action="del" data-id="${r.id}">🗑️ Delete</button>
+    </div></div>`).join('');
+      el.querySelectorAll('.btn-sm[data-action]').forEach(b => b.addEventListener('click', () => {
+        const id = +b.dataset.id, action = b.dataset.action, ref = S.refs.find(x => x.id === id); if (!ref) return;
+        if (action === 'del') { S.refs = S.refs.filter(x => x.id !== id); toast('Referral deleted.', 'warn'); renderSavedRefs(); return }
+        if (action === 'copy') { navigator.clipboard.writeText(ref.fullText).then(() => toast('Copied ✓', 'ok')).catch(() => toast('Copy failed — try View instead', 'warn')); return }
+        if (action === 'view') { document.getElementById('mb').innerHTML = `<h2>${ref.title}</h2><p style="font-size:.72rem;color:var(--muted);margin-bottom:12px">${new Date(ref.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}</p><div style="white-space:pre-wrap;font-size:.82rem;line-height:1.65;color:var(--text)">${ref.fullText}</div>`; document.getElementById('mo').classList.add('on'); return }
+      }));
+    }
+
+    /* ============================================================
+       COMMUNITY
+       ============================================================ */
+    document.getElementById('postBtn').addEventListener('click', () => {
+      const cat = document.getElementById('postCategory').value, content = document.getElementById('postContent').value.trim();
+      if (!content) { toast('Please enter post content.', 'warn'); return }
+      S.posts.unshift({ id: Date.now(), category: cat, content, author: 'You', createdAt: new Date().toISOString(), likes: 0, replies: [] });
+      document.getElementById('postContent').value = ''; toast('Post shared ✓', 'ok'); renderPosts();
+    });
+    function renderPosts() {
+      const el = document.getElementById('postsContainer'), emp = document.getElementById('emptyPosts');
+      if (!S.posts.length) { el.innerHTML = ''; emp.style.display = 'block'; return }
+      emp.style.display = 'none';
+      el.innerHTML = S.posts.map(p => `<div class="post-card" data-post="${p.id}">
+    <span class="post-cat">${p.category}</span>
+    <div class="post-meta"><span class="post-author">${p.author}</span><span class="post-date">${new Date(p.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></div>
+    <div class="post-body">${p.content}</div>
+    <div class="post-acts">
+      <span class="pa like-btn" data-id="${p.id}">👍 ${p.likes} Helpful</span>
+      <span class="pa reply-toggle" data-id="${p.id}">💬 Reply${p.replies.length ? ' (' + p.replies.length + ')' : ''}</span>
+      ${p.author === 'You' ? `<span class="pa del-post" data-id="${p.id}" style="margin-left:auto;color:#c0392b">🗑️</span>` : ''}
+    </div>
+    <div class="replies${p.replies.length ? ' on' : ''}" id="replies-${p.id}">
+      ${p.replies.map(r => `<div class="reply"><div class="ra">${r.author}</div>${r.text}</div>`).join('')}
+      <div class="ri-row"><input type="text" class="ri" data-id="${p.id}" placeholder="Write a reply…" /><button class="ri-btn" data-id="${p.id}">Reply</button></div>
+    </div></div>`).join('');
+      // likes
+      el.querySelectorAll('.like-btn').forEach(b => b.addEventListener('click', () => { const p = S.posts.find(x => x.id === +b.dataset.id); if (p) { p.likes++; b.textContent = '👍 ' + p.likes + ' Helpful'; toast('Marked as helpful ✓', 'ok') } }));
+      // reply toggle
+      el.querySelectorAll('.reply-toggle').forEach(b => b.addEventListener('click', () => { document.getElementById('replies-' + b.dataset.id).classList.toggle('on') }));
+      // delete own post
+      el.querySelectorAll('.del-post').forEach(b => b.addEventListener('click', () => { S.posts = S.posts.filter(x => x.id !== +b.dataset.id); toast('Post deleted.', 'warn'); renderPosts() }));
+      // reply submit (button click + Enter key)
+      el.querySelectorAll('.ri-btn').forEach(btn => btn.addEventListener('click', submitReply));
+      el.querySelectorAll('.ri').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitReply(e, inp) } }));
+    }
+    function submitReply(e, inp) {
+      const input = inp || (e.target.closest('.ri-row').querySelector('.ri'));
+      const txt = input.value.trim(); if (!txt) return;
+      const p = S.posts.find(x => x.id === +input.dataset.id);
+      if (p) { p.replies.push({ author: 'You', text: txt, ts: new Date().toISOString() }); input.value = ''; toast('Reply posted ✓', 'ok'); renderPosts() }
+    }
+
+    /* ============================================================
+       DASHBOARD
+       ============================================================ */
+    function renderDash() {
+      // Stats
+      document.getElementById('dashStats').innerHTML = `
+    <div class="dash-card"><div class="dash-num">${TOOLS.length}</div><div class="dash-label">Tools Available</div></div>
+    <div class="dash-card"><div class="dash-num" style="color:#00843d">${S.favourites.length}</div><div class="dash-label">Favourites</div></div>
+    <div class="dash-card"><div class="dash-num" style="color:var(--accent)">${S.cases.length}</div><div class="dash-label">Active Cases</div></div>
+    <div class="dash-card"><div class="dash-num" style="color:var(--primary-lo)">${S.refs.length}</div><div class="dash-label">Saved Referrals</div></div>`;
+      // Recent cases
+      const casesEl = document.getElementById('dashCases');
+      if (!S.cases.length) { casesEl.innerHTML = '<li style="color:var(--muted);font-size:.8rem;justify-content:center">No cases yet</li>' }
+      else casesEl.innerHTML = S.cases.slice(0, 3).map(c => `<li><span>${c.title}</span><span class="sp-pill ${c.status}" style="font-size:.68rem">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span></li>`).join('');
+      // Favourites
+      const favEl = document.getElementById('dashFavs');
+      if (!S.favourites.length) { favEl.innerHTML = '<li style="color:var(--muted);font-size:.8rem;justify-content:center">No favourites yet</li>' }
+      else favEl.innerHTML = S.favourites.slice(0, 4).map(id => { const t = TOOLS.find(x => x.id === id); return t ? `<li><span>${t.name}</span><span class="bdg" style="font-size:.65rem">${t.domain}</span></li>` : '' }).join('');
+      // Recent posts
+      const postsEl = document.getElementById('dashPosts');
+      postsEl.innerHTML = S.posts.slice(0, 3).map(p => `<li><span>${p.author}: ${p.content.slice(0, 60)}…</span><span class="post-cat" style="margin:0;font-size:.65rem">${p.category}</span></li>`).join('');
+      // Saved referrals
+      const refsEl = document.getElementById('dashRefs');
+      if (!S.refs.length) { refsEl.innerHTML = '<li style="color:var(--muted);font-size:.8rem;justify-content:center">No saved referrals yet</li>' }
+      else refsEl.innerHTML = S.refs.slice(0, 3).map(r => `<li><span>${r.title}</span><span style="font-size:.7rem;color:var(--muted)">${new Date(r.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}</span></li>`).join('');
+      // Responsive layout: stack on small screens
+      const cols = document.getElementById('dashCols');
+      if (window.innerWidth < 680) cols.style.gridTemplateColumns = '1fr'; else cols.style.gridTemplateColumns = '1fr 1fr';
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    renderPills();
+    renderTools();
+    renderEvents();
+    ['searchInput', 'domainFilter', 'formatFilter'].forEach(id => { document.getElementById(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderTools) });
+  </script>
+</body>
+
+</html>
